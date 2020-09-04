@@ -1,34 +1,37 @@
-const mongoose = require("mongoose");
-const { ObjectId } = mongoose.Schema;
-const userSchema = new mongoose.Schema(
-  {
-    username: {
-      type: String,
-      required: true,
-    },
-    password: {
-      type: String,
-      required: true,
-      bcrypt: true,
-    },
-    email: {
-      type: String,
-      required: true,
-    },
-    role: {
-      type: Number,
-      default: 0,
-    },
-    courses: {
-      type: mongoose.Schema.Types.Array,
-      ref: "Course",
-    },
-    enrollments: {
-      type: mongoose.Schema.Types.Array,
-      ref: "Course",
-    },
-  },
-  { timestamps: true }
-);
+var mongoose = require("mongoose");
 
-module.exports = User = mongoose.model("User", userSchema);
+var userSchema = mongoose.Schema({
+  firstname: {
+    type: String,
+  },
+  lastname: {
+    type: String,
+  },
+  email: {
+    type: String,
+  },
+  username: {
+    type: String,
+  },
+  password: {
+    type: String,
+  },
+  Courses: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+    },
+  ],
+  role: {
+    type: Number,
+    default: 0,
+  },
+  enrollments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+    },
+  ],
+});
+
+let User = (module.exports = mongoose.model("User", userSchema));

@@ -19,7 +19,11 @@ const courseSchema = new Schema({
       ref: "User",
     },
   ],
-  lessons: [{}],
+  lessons: [{ type: Schema.Types.ObjectId, ref: "Lesson" }],
+  compeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model("Course", courseSchema);

@@ -3,12 +3,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 exports.signUp = async (req, res) => {
-  const { email, username, password } = req.body;
-
   try {
+    const { email, username, password, firstname, lastname } = req.body;
     ///See if user exitsts
     let user = await User.findOne({ email });
+    console.log(user);
     if (user) {
+      console.log(user);
       return res.status(400).json({ errors: [{ msg: "User already exists" }] });
     }
 
@@ -16,6 +17,8 @@ exports.signUp = async (req, res) => {
       username,
       email,
       password,
+      firstname,
+      lastname,
     });
 
     //Encrypt Password
@@ -24,14 +27,9 @@ exports.signUp = async (req, res) => {
 
     //Saving User
     await user.save();
-
-    console.log(req.user);
-
     //Return JSONWEBTOKEN
     const payload = {
-      user: {
-        id: user.id,
-      },
+      user,
     };
 
     jwt.sign(
@@ -48,6 +46,7 @@ exports.signUp = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
 exports.signIn = async (req, res) => {
   let { email, password } = req.body;
   console.log(req.body);
@@ -69,7 +68,10 @@ exports.signIn = async (req, res) => {
       return res.status(400).json({ msg: "Invaild Credentials" });
     }
 
-    const payload = { user: { id: user.id } };
+    const payload = {
+      user,
+    };
+
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
@@ -86,3 +88,31 @@ exports.signIn = async (req, res) => {
 };
 
 //SignOut
+exports.isInstructor = (req, res, next) => {
+  if (req.user.role === 0) {
+    return res
+      .status(400)
+      .json({ error: "Can't Perform this action while you are student" });
+  }
+  next();
+};
+
+exports.isStudent = (req, res, next) => {
+  console.log(req.user);
+  if (req.user.role === 1) {
+    return res
+      .status(400)
+      .json({ error: "Can't Perform this action while you are instructor" });
+  }
+  next();
+};
+
+exports.getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
