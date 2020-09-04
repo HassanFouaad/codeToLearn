@@ -10,7 +10,7 @@ exports.signUp = async (req, res) => {
     console.log(user);
     if (user) {
       console.log(user);
-      return res.status(400).json({ errors: [{ msg: "User already exists" }] });
+      return res.status(400).json({ error: "User already exists" });
     }
 
     user = new User({
@@ -51,21 +51,15 @@ exports.signIn = async (req, res) => {
   let { email, password } = req.body;
   console.log(req.body);
   try {
-    let user = await User.findOne({ email }, (err, user) => {
-      if (!user || err) {
-        return res
-          .status(401)
-          .json({ error: "Email doesn't exists, Please Signup and try again" });
-      }
-    });
-    if (!password) {
+    let user = await User.findOne({ email });
+    if (!user) {
       return res
-        .status(400)
-        .json({ errors: [{ msg: "Please Enter your password" }] });
+        .status(401)
+        .json({ error: "Email doesn't exists, Please Signup and try again" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ msg: "Invaild Credentials" });
+      return res.status(400).json({ error: "Invaild Credentials" });
     }
 
     const payload = {
@@ -83,7 +77,7 @@ exports.signIn = async (req, res) => {
     );
   } catch (err) {
     console.error(err);
-    return res.status(400).json(err);
+    res.status(400).json(err);
   }
 };
 

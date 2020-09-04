@@ -21,7 +21,7 @@ exports.addCourse = async (req, res) => {
           return res.status(500).json("ServerError");
         }
         res.status(200).json({
-          msg: "Course has been created successfully",
+          error: "Course has been created successfully",
           user,
           newCourse,
         });
@@ -37,12 +37,12 @@ exports.getCourses = async (req, res) => {
   try {
     let courses = await Course.find({});
     if (!courses) {
-      res.status(500).json({ msg: "SERVER ERRORS" });
+      res.status(500).json({ error: "SERVER ERRORS" });
     }
     res.status(200).json(courses);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "SERVER ERRORS" });
+    res.status(500).json({ error: "SERVER ERRORS" });
   }
 };
 
@@ -54,7 +54,7 @@ exports.enRolledCourse = async (req, res, next) => {
       "username email"
     );
     if (!courseFound) {
-      res.status(404).json({ msg: "No Courses Found" });
+      res.status(404).json({ error: "No Courses Found" });
     }
     let notEnrolled =
       courseFound.enrollers.filter(
@@ -62,12 +62,12 @@ exports.enRolledCourse = async (req, res, next) => {
       ).length === 0;
     console.log(notEnrolled);
     if (notEnrolled) {
-      return res.status(401).json({ msg: "Please enroll to the course first" });
+      return res.status(401).json({ error: "Please enroll to the course first" });
     }
     res.status(200).json(courseFound);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "SERVER ERRORS" });
+    res.status(500).json({ error: "SERVER ERRORS" });
   }
 };
 //Signle Course
@@ -79,7 +79,7 @@ exports.getSingleCourse = async (req, res) => {
       "username email"
     ).select('--classes')
     if (!courseFound) {
-      res.status(404).json({ msg: "No Courses Found" });
+      res.status(404).json({ error: "No Courses Found" });
     }
     /* let notEnrolled =
       courseFound.enrollers.filter(
@@ -92,7 +92,7 @@ exports.getSingleCourse = async (req, res) => {
     res.status(200).json(courseFound);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "SERVER ERRORS" });
+    res.status(500).json({ error: "SERVER ERRORS" });
   }
 };
 
@@ -102,7 +102,7 @@ exports.enrollTOCourse = async (req, res) => {
   try {
     let course = await Course.findById(courseReg);
     if (!course) {
-      return res.status(404).json({ msg: "No Courses found" });
+      return res.status(404).json({ error: "No Courses found" });
     }
     if (
       course.enrollers.filter(
@@ -111,7 +111,7 @@ exports.enrollTOCourse = async (req, res) => {
     ) {
       return res
         .status(400)
-        .json({ msg: "You have already Enrolled to the course :)" });
+        .json({ error: "You have already Enrolled to the course :)" });
     }
     course.enrollers.unshift(req.user._id);
 
@@ -135,13 +135,13 @@ exports.unenrollTOCourse = async (req, res) => {
   try {
     let course = await Course.findById(courseReg);
     if (!course) {
-      return res.status(404).json({ msg: "No Courses found" });
+      return res.status(404).json({ error: "No Courses found" });
     }
     if (
       course.enrollers.filter((enroll) => enroll.toString() === req.user._id)
         .length === 0
     ) {
-      return res.status(400).json({ msg: "You have not Enrolled yet" });
+      return res.status(400).json({ error: "You have not Enrolled yet" });
     }
     const removeIndex = course.enrollers
       .map((enroll) => enroll.toString())
@@ -166,12 +166,12 @@ exports.editCourse = async (req, res) => {
   try {
     let courseFound = await Course.findById(req.params.courseId);
     if (!courseFound) {
-      return res.status(404).json({ msg: "No Courses found" });
+      return res.status(404).json({ error: "No Courses found" });
     }
     console.log(courseFound.teacher);
     if (!courseFound.teacher.toString() === req.user._id) {
       return res.status(400).json({
-        msg: "You don't Own this course, Try harder to hack us next time",
+        error: "You don't Own this course, Try harder to hack us next time",
       });
     }
     const { name, description, lessons } = req.body;
@@ -199,15 +199,15 @@ exports.delCourse = async (req, res) => {
   try {
     let courseFound = await Course.findById(req.params.courseId);
     if (!courseFound) {
-      return res.status(404).json({ msg: "No Courses found" });
+      return res.status(404).json({ error: "No Courses found" });
     }
     if (!courseFound.teacher.toString() === req.user._id) {
       return res.status(400).json({
-        msg: "You don't Own this course, Try harder to hack us next time",
+        error: "You don't Own this course, Try harder to hack us next time",
       });
     }
     courseFound.remove();
-    return res.status(200).json({ msg: "Removed the course" });
+    return res.status(200).json({ error: "Removed the course" });
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server Error");
