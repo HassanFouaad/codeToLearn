@@ -24,6 +24,10 @@ const courseSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  photo: {
+    data: Buffer,
+    contentType: String,
+  },
 });
 
 module.exports = mongoose.model("Course", courseSchema);

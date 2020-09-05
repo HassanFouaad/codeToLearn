@@ -1,5 +1,6 @@
 import axios from "axios";
 import { returnErrors, clearErrors } from "./errorActions";
+
 import {
   AUTH_ERROR,
   REGISTER_FAIL,
@@ -11,11 +12,14 @@ import {
   LOGOUT_SUCCESS,
 } from "./types";
 
+export const userLodaing = () => ({
+  type: USER_LOADING,
+});
 //Check token and load user
 
 export const loadUser = () => (dispatch, getState) => {
   //User Loading
-  dispatch({ type: USER_LOADING });
+  dispatch(userLodaing(true));
   //FETCHING USER
   //Get token from Local Storage
 
@@ -41,7 +45,7 @@ export const loadUser = () => (dispatch, getState) => {
 export const tokenConfig = (getState) => {
   //Get token from Local Storage
   let token = getState().auth.token;
-
+  console.log(token);
   //headers
   const config = {
     headers: {
@@ -104,12 +108,13 @@ export const login = ({ email, password }) => (dispatch) => {
   const body = { email, password };
   axios
     .post("/api/signin", body, config)
-    .then((res) =>
+    .then((res) => {
       dispatch({
         type: LOGIN_SUCCESS,
         payload: res.data,
-      })
-    )
+      });
+      dispatch(loadUser());
+    })
     .catch((error) => {
       dispatch(
         returnErrors(error.response.data, error.response.status, "LOGIN_FAIL")

@@ -9,7 +9,16 @@ import { loadUser } from "./actions/authActions";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import HomePage from "./Pages/HomePage";
 import CoursesPage from "./Pages/CoursesPage";
+import PrivateRoute from "./Components/PrivateRoutes/PrivateRoute";
+import InstructorRoute from "./Components/Student/InstructorRoute";
+
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      mounted: false,
+    };
+  }
   componentDidMount() {
     store.dispatch(loadUser());
   }
@@ -22,6 +31,11 @@ class App extends Component {
             <Route exact path="/" component={HomePage}></Route>
             <Route exact path="/signup" component={SignUp}></Route>
             <Route exact path="/courses" component={CoursesPage}></Route>
+            <PrivateRoute
+              exact
+              path="/student/dashboard"
+              component={() => <InstructorRoute> </InstructorRoute>}
+            ></PrivateRoute>
           </Switch>
         </BrowserRouter>
       </Provider>

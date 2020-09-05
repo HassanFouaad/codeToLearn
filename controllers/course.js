@@ -1,32 +1,77 @@
 const Course = require("../models/Courses");
 const User = require("../models/User");
-const { json } = require("body-parser");
+const formidable = require("formidable");
+const fs = require("fs");
+const _ = require("lodash");
 
 exports.addCourse = async (req, res) => {
-  const { name, description } = req.body;
   try {
-    console.log(req.user);
-    let newCourse = new Course({ name, description, teacher: req.user._id });
-    await newCourse.save();
-    await newCourse.update({ teacher: req.user._id });
-    console.log("Addidng user " + req.user);
-    await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        $push: { courses: newCourse },
-      },
-      { new: true },
-      (err, user) => {
-        if (err || !user) {
-          return res.status(500).json("ServerError");
-        }
-        res.status(200).json({
-          error: "Course has been created successfully",
-          user,
-          newCourse,
-        });
+    let form = new formidable.IncomingForm();
+    form.keepExtensions = true;
+    form.parse(req, async (err, fields, files) => {
+      if (err) {
+        console.log(err);
+        return res.status(400).json({ error: "Image couldn't be Uploaded" });
       }
-    );
+      const teacher = req.user._id;
+      const { name, description } = fields;
+      if (!name || !description) {
+        console.log(fields);
+        return res
+          .status(400)
+          .json({ error: "Please compelete all Course fields" });
+      }
+      const newCourse = new Course({ name, description, teacher }).populate(
+        "teacher",
+        "_id firstname"
+      );
+      await newCourse.updateOne({ teacher: req.user._id }, (err, user) => {
+        if (err) console.error(err);
+      });
+      if (files.photo) {
+        //1mb = 1000000
+        if (files.photo.size > 2000000) {
+          return res
+            .status(400)
+            .json({ error: "Image Size should be less than 2mb" });
+        }
+        console.log("Files Photo:" + files.photo);
+        newCourse.photo.data = fs.readFileSync(files.photo.path);
+        newCourse.photo.contentType = files.photo.type;
+      }
+      await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          $push: { Courses: newCourse },
+        },
+        { new: true },
+        (err, user) => {
+          if (err || !user) {
+            console.log(err);
+            return res.status(500).json(err);
+          }
+          newCourse.photo = undefined;
+          /*  res.status(200).json({
+            msg: "Course has been created successfully",
+            user,
+            newCourse,
+          }); */
+        }
+      );
+      await newCourse.save((err, response) => {
+        if (err) {
+          console.log(err);
+          res.status(400).json({ error: err });
+        }
+        response.photo = undefined;
+        res.status(200).json({
+          message: `${response.name} has been created successfully`,
+          response,
+        });
+      });
+
+      console.log("Addidng user " + req.user);
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json("ServerError");
@@ -35,7 +80,10 @@ exports.addCourse = async (req, res) => {
 
 exports.getCourses = async (req, res) => {
   try {
-    let courses = await Course.find({});
+    let courses = await Course.find({}).populate(
+      "teacher",
+      "_id firstname lastname email"
+    );
     if (!courses) {
       res.status(500).json({ error: "SERVER ERRORS" });
     }
@@ -62,7 +110,9 @@ exports.enRolledCourse = async (req, res, next) => {
       ).length === 0;
     console.log(notEnrolled);
     if (notEnrolled) {
-      return res.status(401).json({ error: "Please enroll to the course first" });
+      return res
+        .status(401)
+        .json({ error: "Please enroll to the course first" });
     }
     res.status(200).json(courseFound);
   } catch (error) {
@@ -74,10 +124,9 @@ exports.enRolledCourse = async (req, res, next) => {
 exports.getSingleCourse = async (req, res) => {
   let course = req.params.courseId;
   try {
-    let courseFound = await Course.findById(course).populate(
-      "teacher",
-      "username email"
-    ).select('--classes')
+    let courseFound = await Course.findById(course)
+      .populate("teacher", "username email")
+      .select("--classes");
     if (!courseFound) {
       res.status(404).json({ error: "No Courses Found" });
     }
@@ -114,7 +163,6 @@ exports.enrollTOCourse = async (req, res) => {
         .json({ error: "You have already Enrolled to the course :)" });
     }
     course.enrollers.unshift(req.user._id);
-
     await course.save();
     await User.findByIdAndUpdate(
       req.user._id,
@@ -151,7 +199,7 @@ exports.unenrollTOCourse = async (req, res) => {
     await User.findByIdAndUpdate(
       req.user._id,
       {
-        $pull: { enrollments: course.toString() },
+        $pull: { enrollments: course._id },
       },
       { new: true }
     );

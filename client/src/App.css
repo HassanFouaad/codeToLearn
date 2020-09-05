@@ -58,8 +58,29 @@ body {
   font-weight: 500;
   line-height: 14px;
   border-radius: 50px;
-  min-width: 170px;
   text-align: center;
   border: none;
   cursor: pointer;
+}
+
+
+.loader:empty {
+  position: absolute;
+  top: calc(50% - 4em);
+  left: calc(50% - 3em);
+  width: 6em;
+  height: 6em;
+  border: 1.1em solid var(--primaryColor);
+  border-left: 1.1em solid var(--hoverColor);
+  border-radius: 50%;
+  animation: load8 1.1s infinite linear;
+}
+
+@keyframes load8 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

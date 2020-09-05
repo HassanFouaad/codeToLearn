@@ -19,8 +19,8 @@ router.get("/courses/:courseId", auth, getSingleCourse);
 router.put("/courses/:courseId", auth, editCourse);
 router.delete("/courses/:courseId", auth, delCourse);
 router.delete("/courses/enrolled/:courseId", auth, isStudent, enRolledCourse);
-router.post("/courses/:courseId/enroll", auth, isStudent, enrollTOCourse);
-router.post("/courses/:courseId/unenroll", auth, isStudent, unenrollTOCourse);
+router.put("/courses/:courseId/enroll", auth, isStudent, enrollTOCourse);
+router.put("/courses/:courseId/unenroll", auth, isStudent, unenrollTOCourse);
 /* router.post("/signup", signIn); */
 
 module.exports = router;

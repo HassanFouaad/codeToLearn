@@ -11,7 +11,6 @@ export function Navbar({ auth }) {
   const [isOpen, setIsOpen] = useState(false);
   const handleToggle = () => setIsOpen(!isOpen);
 
-  useEffect(() => {}, [auth]);
   const authLinks = (
     <Fragment>
       <NavItem>
