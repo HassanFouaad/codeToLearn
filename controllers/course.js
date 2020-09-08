@@ -16,7 +16,6 @@ exports.addCourse = async (req, res) => {
       const teacher = req.user._id;
       const { name, description } = fields;
       if (!name || !description) {
-        console.log(fields);
         return res
           .status(400)
           .json({ error: "Please compelete all Course fields" });
@@ -28,6 +27,9 @@ exports.addCourse = async (req, res) => {
       await newCourse.updateOne({ teacher: req.user._id }, (err, user) => {
         if (err) console.error(err);
       });
+      if (!files.photo) {
+        return res.status(400).json({ error: "Please Upload Course Photo" });
+      }
       if (files.photo) {
         //1mb = 1000000
         if (files.photo.size > 2000000) {
@@ -35,10 +37,21 @@ exports.addCourse = async (req, res) => {
             .status(400)
             .json({ error: "Image Size should be less than 2mb" });
         }
-        console.log("Files Photo:" + files.photo);
+
         newCourse.photo.data = fs.readFileSync(files.photo.path);
         newCourse.photo.contentType = files.photo.type;
       }
+      await newCourse.save((err, response) => {
+        if (err) {
+          console.log(err);
+          res.status(400).json({ error: err });
+        }
+        response.photo = undefined;
+        res.status(200).json({
+          message: `${response.name} has been created successfully`,
+          response,
+        });
+      });
       await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -58,19 +71,6 @@ exports.addCourse = async (req, res) => {
           }); */
         }
       );
-      await newCourse.save((err, response) => {
-        if (err) {
-          console.log(err);
-          res.status(400).json({ error: err });
-        }
-        response.photo = undefined;
-        res.status(200).json({
-          message: `${response.name} has been created successfully`,
-          response,
-        });
-      });
-
-      console.log("Addidng user " + req.user);
     });
   } catch (error) {
     console.error(error);
@@ -108,7 +108,7 @@ exports.enRolledCourse = async (req, res, next) => {
       courseFound.enrollers.filter(
         (enroller) => enroller.toString() === req.user._id
       ).length === 0;
-    console.log(notEnrolled);
+
     if (notEnrolled) {
       return res
         .status(401)
@@ -216,7 +216,7 @@ exports.editCourse = async (req, res) => {
     if (!courseFound) {
       return res.status(404).json({ error: "No Courses found" });
     }
-    console.log(courseFound.teacher);
+
     if (!courseFound.teacher.toString() === req.user._id) {
       return res.status(400).json({
         error: "You don't Own this course, Try harder to hack us next time",
@@ -260,4 +260,25 @@ exports.delCourse = async (req, res) => {
     console.error(error);
     return res.status(500).send("Server Error");
   }
+};
+
+/* Course PHOTO */
+exports.coursePhoto = (req, res, next) => {
+  if (req.course.photo.data) {
+    res.setHeader("Content-Type", req.course.photo.contentType);
+    return res.send(req.course.photo.data);
+  }
+  next();
+};
+
+exports.courseById = (req, res, next, id) => {
+  Course.findById(id).exec((err, course) => {
+    if (err || !course) {
+      return res.status(400).json({
+        error: "Course not Found!",
+      });
+    }
+    req.course = course;
+    next();
+  });
 };

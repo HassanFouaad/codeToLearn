@@ -7,9 +7,8 @@ exports.signUp = async (req, res) => {
     const { email, username, password, firstname, lastname } = req.body;
     ///See if user exitsts
     let user = await User.findOne({ email });
-    console.log(user);
+
     if (user) {
-      console.log(user);
       return res.status(400).json({ error: "User already exists" });
     }
 
@@ -49,7 +48,6 @@ exports.signUp = async (req, res) => {
 
 exports.signIn = async (req, res) => {
   let { email, password } = req.body;
-  console.log(req.body);
   try {
     let user = await User.findOne({ email });
     if (!user) {
@@ -92,7 +90,6 @@ exports.isInstructor = (req, res, next) => {
 };
 
 exports.isStudent = (req, res, next) => {
-  console.log(req.user);
   if (req.user.role === 1) {
     return res
       .status(400)
@@ -103,8 +100,13 @@ exports.isStudent = (req, res, next) => {
 
 exports.getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
-    res.json(user);
+    const user = await User.findById(req.user._id)
+      .select("-password")
+      .populate(
+        "Courses",
+        "name description createdAt enrollers lessons compeleted teacher"
+      );
+    return res.json(user);
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");

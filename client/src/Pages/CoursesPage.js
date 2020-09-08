@@ -5,7 +5,7 @@ import { Container, Jumbotron } from "reactstrap";
 import Course from "../Components/Course";
 import styled from "styled-components";
 import hero from "../images/1.jpg";
-import { Link } from "react-router-dom";
+
 export const CoursesPage = ({ courses, getCourses, loading, error }) => {
   useEffect(() => {
     getCourses();
@@ -43,15 +43,15 @@ export const CoursesPage = ({ courses, getCourses, loading, error }) => {
           {error ? (
             <h1>Failed To Load Courses</h1>
           ) : (
-            <div className="row">
-              {courses.map((course) => {
+            <Fragment>
+              {courses.map((course, i) => {
                 return (
-                  <div className="col-sm-3">
+                  <div className="row justify-content-center">
                     <Course course={course}></Course>
                   </div>
                 );
               })}
-            </div>
+            </Fragment>
           )}
         </Container>
       )}

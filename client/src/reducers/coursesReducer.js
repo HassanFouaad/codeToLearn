@@ -1,17 +1,24 @@
 import {
   COURSES_FAILED,
   COURSES_LOADED,
-  ENROLL_SUCCESS,
-  ENROLL_FAILED,
+  ADD_COURSE_LOADING,
+  ADD_COURSE,
+  COURSE_LOADING,
+  ADD_COURSE_FAIL,
 } from "../actions/types";
 const inintialState = {
   courses: [],
   course: null,
-  loading: true,
+  loading: false,
   error: false,
 };
 export default function (state = inintialState, action) {
   switch (action.type) {
+    case COURSE_LOADING:
+      return {
+        ...state,
+        loading: true,
+      };
     case COURSES_LOADED:
       return {
         ...state,
@@ -20,6 +27,20 @@ export default function (state = inintialState, action) {
       };
     case COURSES_FAILED:
       return { ...state, courses: [], loading: false, error: true };
+    case ADD_COURSE_LOADING:
+      return { ...state, loading: true };
+    case ADD_COURSE:
+      return {
+        ...state,
+        courses: [...state.courses, action.payload.response],
+        loading: false,
+        error: false,
+      };
+    case ADD_COURSE_FAIL:
+      return {
+        ...state,
+        loading: false,
+      };
     default:
       return state;
   }

@@ -1,6 +1,6 @@
 import axios from "axios";
-import { returnErrors, clearErrors } from "./errorActions";
-
+import { returnErrors } from "./errorActions";
+import { toastr } from "react-redux-toastr";
 import {
   AUTH_ERROR,
   REGISTER_FAIL,
@@ -19,7 +19,7 @@ export const userLodaing = () => ({
 
 export const loadUser = () => (dispatch, getState) => {
   //User Loading
-  dispatch(userLodaing(true));
+  dispatch(userLodaing());
   //FETCHING USER
   //Get token from Local Storage
 
@@ -27,7 +27,6 @@ export const loadUser = () => (dispatch, getState) => {
   axios
     .get("/api/auth", tokenConfig(getState))
     .then((res) => {
-      console.log(res);
       return dispatch({
         type: USER_LOADED,
         payload: res.data,
@@ -45,7 +44,6 @@ export const loadUser = () => (dispatch, getState) => {
 export const tokenConfig = (getState) => {
   //Get token from Local Storage
   let token = getState().auth.token;
-  console.log(token);
   //headers
   const config = {
     headers: {
@@ -114,6 +112,7 @@ export const login = ({ email, password }) => (dispatch) => {
         payload: res.data,
       });
       dispatch(loadUser());
+      toastr.success("Welcome Back!", "You have successfully logged in");
     })
     .catch((error) => {
       dispatch(
@@ -127,6 +126,7 @@ export const login = ({ email, password }) => (dispatch) => {
 
 // Logout User
 export const logout = () => {
+  toastr.success("See you later", "You have successfully logged out");
   return {
     type: LOGOUT_SUCCESS,
   };

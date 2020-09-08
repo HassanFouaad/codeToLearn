@@ -21,6 +21,7 @@ mongoose.connect(
 /* app.use(passport.initialize()); */
 /* app.use(passport.session());
 require("./passport")(passport); */
+app.disable('etag');
 app.use(express.json({ extended: false }));
 app.use(bodyParser.json());
 
