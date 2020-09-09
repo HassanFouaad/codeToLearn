@@ -3,7 +3,7 @@ const User = require("../models/User");
 const formidable = require("formidable");
 const fs = require("fs");
 const _ = require("lodash");
-
+const Notification = require("../models/Notfication");
 exports.addCourse = async (req, res) => {
   try {
     let form = new formidable.IncomingForm();
@@ -126,7 +126,7 @@ exports.getSingleCourse = async (req, res) => {
   try {
     let courseFound = await Course.findById(course)
       .populate("teacher", "username email")
-      .select("--classes");
+      .select("-lessons").select("-photo");
     if (!courseFound) {
       res.status(404).json({ error: "No Courses Found" });
     }
@@ -171,7 +171,8 @@ exports.enrollTOCourse = async (req, res) => {
       },
       { new: true }
     );
-    return res.json(course.enrollers);
+    await Notification.create({ receiver: course.teacher }, () => {});
+    return res.json(course.teacher);
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server Error");
@@ -233,10 +234,10 @@ exports.editCourse = async (req, res) => {
         res.json(course);
       }
     )
-      .select("--teacher ")
-      .select("--_id")
+      .select("-teacher")
+      .select("-_id")
       .select("-enrollers")
-      .select("--reviews");
+      .select("-reviews");
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server Error");

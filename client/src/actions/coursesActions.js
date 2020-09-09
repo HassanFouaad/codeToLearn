@@ -9,11 +9,18 @@ import {
   UNENROLL_SUCCESS,
   ADD_COURSE_LOADING,
   COURSE_LOADING,
+  GET_SINGLE_COURSE,
 } from "./types";
 import axios from "axios";
 import { returnErrors } from "./errorActions";
 import { tokenConfig, loadUser } from "./authActions";
 import { toastr } from "react-redux-toastr";
+import Pusher from "pusher-js";
+import store from "../store";
+const pusher = new Pusher("13a4d614457a4ab93b78", {
+  cluster: "eu",
+});
+const channel = pusher.subscribe("notifications");
 export const getCourses = () => (dispatch) => {
   dispatch({ type: COURSE_LOADING });
   const config = {
@@ -104,4 +111,19 @@ export const unenrollToCourse = (id) => (dispatch, getState) => {
         type: UNENROLL_FAILED,
       });
     });
+};
+
+export const getSingleCourse = (courseId) => async (dispatch, getState) => {
+  try {
+    const config = {
+      headers: {
+        "Content-type": "application/json",
+      },
+    };
+    const res = await axios.get(`/api/courses/${courseId}`, tokenConfig(getState));
+    dispatch({
+      type: GET_SINGLE_COURSE,
+      payload: res.data,
+    });
+  } catch (error) {}
 };

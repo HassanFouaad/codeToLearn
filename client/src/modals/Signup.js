@@ -48,6 +48,7 @@ const SignUp = ({ history, isAuthenticated, error, register, clearErrors }) => {
         lastname,
         email,
         password,
+        role,
       };
       register(newUser);
     }
@@ -75,6 +76,7 @@ const SignUp = ({ history, isAuthenticated, error, register, clearErrors }) => {
     password,
     password2,
     username,
+    role,
   } = formData;
 
   return (
@@ -93,7 +95,15 @@ const SignUp = ({ history, isAuthenticated, error, register, clearErrors }) => {
           {" "}
           <Form onSubmit={(e) => onSubmit(e)}>
             {erroraya ? ToastsStore.error(error.msg.error) : null}
-            <FormGroup className="col-sm text-center"></FormGroup>
+            <FormGroup className="col-sm text-center">
+              <Input type="select" name="role" onChange={(e) => onChange(e)}>
+                <option selected value="0">
+                  Choose your Account Type (Student by default)
+                </option>
+                <option value="1">Instructor</option>
+                <option value="0">Student</option>
+              </Input>
+            </FormGroup>
             <FormGroup className="col-sm">
               <Input
                 type="text"
@@ -111,7 +121,7 @@ const SignUp = ({ history, isAuthenticated, error, register, clearErrors }) => {
                 value={lastname}
                 onChange={(e) => onChange(e)}
               ></Input>
-            </FormGroup>{" "}
+            </FormGroup>
             <FormGroup className="col-sm">
               <Input
                 type="text"

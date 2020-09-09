@@ -55,12 +55,12 @@ const InstructorRoute = ({ auth }) => {
                   {auth.user.Courses.map((course, i) => (
                     <ListGroupItem key={i}>
                       <Row>
-                        <Col>
+                        <Col sm>
                           <Link to={`/courses/${course._id}`}>
                             {course.name}
                           </Link>
                         </Col>
-                        <Col>
+                        <Col sm>
                           <div>
                             Enrollers: {JSON.stringify(course.enrollers.length)}
                           </div>
@@ -68,17 +68,22 @@ const InstructorRoute = ({ auth }) => {
                             Lessons: {JSON.stringify(course.lessons.length)}
                           </div>
                         </Col>
-                        <Link to={`/courses/${course._id}/lessons`}>
-                          <div
-                            className="btn"
-                            style={{
-                              background: "var(--hoverColor)",
-                              color: "white",
-                            }}
+                        <Col>
+                          <Link
+                            to={`/courses/${course._id}/lessons`}
+                            className="ml-5"
                           >
-                            Lessons
-                          </div>
-                        </Link>
+                            <div
+                              className="btn"
+                              style={{
+                                background: "var(--hoverColor)",
+                                color: "white",
+                              }}
+                            >
+                              Lessons
+                            </div>
+                          </Link>
+                        </Col>
                       </Row>
                     </ListGroupItem>
                   ))}

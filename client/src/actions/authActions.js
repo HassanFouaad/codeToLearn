@@ -68,13 +68,22 @@ export const register = ({
   lastname,
   email,
   password,
+  role,
 }) => (dispatch) => {
   const config = {
     headers: {
       "Content-type": "application/json",
     },
   };
-  const body = { username, firstname, lastname, email, password };
+
+  const body = {
+    username,
+    firstname,
+    lastname,
+    email,
+    password,
+    role,
+  };
   axios
     .post("/api/signup", body, config)
     .then((res) =>

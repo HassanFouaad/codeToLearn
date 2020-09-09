@@ -14,7 +14,8 @@ import InstructorRoute from "./Components/InstructorPage/InstructorRoute";
 import AddCoursePage from "./Pages/AddCoursePage";
 import ReduxToastr from "react-redux-toastr";
 import SingleCoursePage from "./Pages/SingleCoursePage";
-
+import Pusher from "pusher-js";
+import AddLesson from "./Components/Lessons/addLesson";
 const App = () => {
   useEffect(() => {
     store.dispatch(loadUser());
@@ -39,6 +40,7 @@ const App = () => {
           <Route exact path="/signup" component={SignUp}></Route>
           <Route exact path="/courses" component={CoursesPage}></Route>
           <Route path="/courses/:courseId" component={SingleCoursePage}></Route>
+
           <PrivateRoute
             exact
             path="/instructor/dashboard"
@@ -48,6 +50,11 @@ const App = () => {
             exact
             path="/instructor/addcourse"
             component={AddCoursePage}
+          ></PrivateRoute>
+          <PrivateRoute
+            exact
+            path="/instructor/:courseId/addlesson"
+            component={AddLesson}
           ></PrivateRoute>
         </Switch>
       </BrowserRouter>

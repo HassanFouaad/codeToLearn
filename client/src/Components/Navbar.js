@@ -70,7 +70,7 @@ export function Navbar({ auth, history }) {
             <Nav className="ml-auto" navbar>
               {auth && auth.isAuthenticated ? authLinks : guestLinks}
               <NavItem>
-                <Link to="/courses" >
+                <Link to="/courses">
                   <NavLink>Courses</NavLink>
                 </Link>
               </NavItem>

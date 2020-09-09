@@ -4,7 +4,15 @@ const jwt = require("jsonwebtoken");
 
 exports.signUp = async (req, res) => {
   try {
-    const { email, username, password, firstname, lastname } = req.body;
+    const {
+      email,
+      username,
+      password,
+      firstname,
+      lastname,
+      role = parseInt(role, 10),
+    } = req.body;
+    console.log(req.body);
     ///See if user exitsts
     let user = await User.findOne({ email });
 
@@ -18,6 +26,7 @@ exports.signUp = async (req, res) => {
       password,
       firstname,
       lastname,
+      role,
     });
 
     //Encrypt Password
@@ -104,8 +113,9 @@ exports.getUser = async (req, res) => {
       .select("-password")
       .populate(
         "Courses",
-        "name description createdAt enrollers lessons compeleted teacher"
-      );
+        "_id name description createdAt enrollers lessons compeleted teacher lessons"
+      )
+      .populate("Courses.lessons");
     return res.json(user);
   } catch (error) {
     console.error(error);

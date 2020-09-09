@@ -12,9 +12,8 @@ const lessonSchema = new Schema(
     text: {
       type: String,
     },
-    compeleted: {
-      type: Boolean,
-      default: false,
+    video: {
+      type: String,
     },
     compeletedBy: [
       {
