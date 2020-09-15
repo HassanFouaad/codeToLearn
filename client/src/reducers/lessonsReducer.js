@@ -40,6 +40,7 @@ export default function (state = inintialState, action) {
       return {
         ...state,
         loading: false,
+        error: true,
       };
     default:
       return state;

@@ -84,7 +84,7 @@ exports.updateLesson = async (req, res) => {
 exports.getAllLessons = async (req, res) => {
   try {
     let course = await Course.findById(req.params.courseId)
-      .populate({path: 'lessons', options: { sort: { 'createdAt': 1 } } })
+      .populate({path: 'lessons', options: { sort: { 'number': 1 } } })
       .sort({ createdAt: 1 });
     if (!course) {
       return res.status(404).json({ error: "No Courses found" });

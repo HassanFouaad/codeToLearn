@@ -2,14 +2,7 @@ import React, { useState, Fragment, useEffect } from "react";
 import { connect } from "react-redux";
 import { addLesson } from "../../actions/lessonsActions";
 import { FormGroup, Label, Input, Container, Col } from "reactstrap";
-export function AddLesson({
-  match,
-  loading,
-  error,
-  addLesson,
-  clearErrors,
-  auth,
-}) {
+export function AddLesson({ match, loading, error, addLesson, auth }) {
   const [values, setValues] = useState({
     number: "",
     title: "",
@@ -23,6 +16,9 @@ export function AddLesson({
   const handleSubmit = (event) => {
     event.preventDefault();
     addLesson(formData, match.params.courseId);
+    if (error == true) {
+      setValues({...values});
+    }
   };
   useEffect(() => {
     console.log(match.params.courseId);
@@ -93,6 +89,7 @@ export function AddLesson({
 
 const mapStateToProps = (state) => ({
   lessons: state.lessons.lessons,
+  error: state.lessons.error,
   auth: state.auth,
 });
 export default connect(mapStateToProps, { addLesson })(AddLesson);

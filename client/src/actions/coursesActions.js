@@ -16,7 +16,7 @@ import { returnErrors } from "./errorActions";
 import { tokenConfig, loadUser } from "./authActions";
 import { toastr } from "react-redux-toastr";
 import Pusher from "pusher-js";
-import store from "../store";
+import { getLessons } from "./lessonsActions";
 const pusher = new Pusher("13a4d614457a4ab93b78", {
   cluster: "eu",
 });
@@ -77,6 +77,7 @@ export const enrollToCourse = (id) => (dispatch, getState) => {
     .put(`/api/courses/${id}/enroll`, body, tokenConfig(getState))
     .then((res) => {
       dispatch(loadUser());
+      dispatch(getLessons(id));
       dispatch({
         type: ENROLL_SUCCESS,
       });
@@ -100,6 +101,7 @@ export const unenrollToCourse = (id) => (dispatch, getState) => {
     .put(`/api/courses/${id}/unenroll`, body, tokenConfig(getState))
     .then((res) => {
       dispatch(loadUser());
+      dispatch(getLessons(id));
       dispatch({
         type: UNENROLL_SUCCESS,
       });
@@ -120,7 +122,10 @@ export const getSingleCourse = (courseId) => async (dispatch, getState) => {
         "Content-type": "application/json",
       },
     };
-    const res = await axios.get(`/api/courses/${courseId}`, tokenConfig(getState));
+    const res = await axios.get(
+      `/api/courses/${courseId}`,
+      tokenConfig(getState)
+    );
     dispatch({
       type: GET_SINGLE_COURSE,
       payload: res.data,

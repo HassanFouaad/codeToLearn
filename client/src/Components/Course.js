@@ -4,17 +4,26 @@ import { connect } from "react-redux";
 import { enrollToCourse, unenrollToCourse } from "../actions/coursesActions";
 import { Link } from "react-router-dom";
 import { ButtonGroup } from "reactstrap";
-const Course = ({ course, i, auth, enrollToCourse, unenrollToCourse }) => {
+const Course = ({
+  course,
+  i,
+  auth,
+  enrollToCourse,
+  unenrollToCourse,
+  showGotoCourse,
+}) => {
   const EditCourse = () => {
     return auth && auth.user && auth.user._id === course.teacher._id ? (
-      <Link>
-        <div className="site-btn" onClick={() => enrollToCourse(course._id)}>
-          Edit Course
-        </div>
-        <Link to="/instructor/addcourse">
-          <div className="site-btn">Add New Course</div>
+      <ButtonGroup>
+        {showGotoCourse && (
+          <Link to={`/courses/${course._id}`}>
+            <div className="site-btn">Go to Course</div>
+          </Link>
+        )}
+        <Link to={`/instructor/${course._id}/addlesson`}>
+          <div className="site-btn">Add New Lesson</div>
         </Link>
-      </Link>
+      </ButtonGroup>
     ) : (
       <Fragment>
         This course is created by
@@ -30,9 +39,11 @@ const Course = ({ course, i, auth, enrollToCourse, unenrollToCourse }) => {
           {auth && auth.user && auth.user.enrollments.includes(course._id) ? (
             <Fragment>
               <ButtonGroup>
-                <Link to={`courses/${course._id}`}>
-                  <div className="site-btn ml-2">Go To Course</div>
-                </Link>
+                {showGotoCourse && (
+                  <Link to={`/courses/${course._id}`}>
+                    <div className="site-btn ml-2">Go To Course</div>
+                  </Link>
+                )}
                 <div
                   className="site-btn"
                   onClick={() => unenrollToCourse(course._id)}

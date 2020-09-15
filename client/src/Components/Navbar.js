@@ -13,21 +13,13 @@ import RegisterModal from "../modals/Signup";
 import LoginModal from "../modals/Login";
 import Logout from "../modals/Logout";
 import { Link } from "react-router-dom";
+import Search from "./Search";
 
 export function Navbar({ auth, history }) {
   const [isOpen, setIsOpen] = useState(false);
   const handleToggle = () => setIsOpen(!isOpen);
   const authLinks = (
     <Fragment>
-      <NavItem>
-        <span className="navbar-text mr-3">
-          <strong>
-            {auth && auth.isAuthenticated && auth.user
-              ? `Welcome ${auth.user.firstname}`
-              : ""}
-          </strong>
-        </span>
-      </NavItem>
       <NavItem>
         <Logout />
       </NavItem>
@@ -41,8 +33,9 @@ export function Navbar({ auth, history }) {
               ? `/instructor/dashboard`
               : "/student/dashboard";
           }}
+          className="nav-link"
         >
-          <NavLink>Dashboard</NavLink>
+          Dashboard
         </Link>
       </NavItem>
     </Fragment>
@@ -65,15 +58,18 @@ export function Navbar({ auth, history }) {
           <Link to="/" className="nav-brand" style={{ color: "white" }}>
             CodeToLearn
           </Link>
+          <NavItem style={{ color: "black" }} className="mt-1 ml-auto">
+            <Search></Search>
+          </NavItem>
           <NavbarToggler onClick={handleToggle} />
           <Collapse isOpen={isOpen} navbar>
             <Nav className="ml-auto" navbar>
-              {auth && auth.isAuthenticated ? authLinks : guestLinks}
               <NavItem>
-                <Link to="/courses">
-                  <NavLink>Courses</NavLink>
+                <Link to="/courses" className="nav-link">
+                  Explore
                 </Link>
               </NavItem>
+              {auth && auth.isAuthenticated ? authLinks : guestLinks}
             </Nav>
           </Collapse>
         </div>

@@ -111,11 +111,8 @@ exports.getUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
       .select("-password")
-      .populate(
-        "Courses",
-        "_id name description createdAt enrollers lessons compeleted teacher lessons"
-      )
-      .populate("Courses.lessons");
+      .populate({ path: "Courses", options: { select: "-photo" } });
+    console.log(user);
     return res.json(user);
   } catch (error) {
     console.error(error);

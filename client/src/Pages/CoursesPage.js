@@ -5,6 +5,7 @@ import { Container, Jumbotron } from "reactstrap";
 import Course from "../Components/Course";
 import styled from "styled-components";
 import hero from "../images/1.jpg";
+import Search from "../Components/Search";
 
 export const CoursesPage = ({ courses, getCourses, loading, error }) => {
   useEffect(() => {
@@ -29,6 +30,7 @@ export const CoursesPage = ({ courses, getCourses, loading, error }) => {
                       knowledge and absorbing the truth about life. Knowledge is
                       power.
                     </p>
+                    <Search></Search>
                   </div>
                 </div>
               </div>
@@ -47,7 +49,7 @@ export const CoursesPage = ({ courses, getCourses, loading, error }) => {
               {courses.map((course, i) => {
                 return (
                   <div className="row justify-content-center">
-                    <Course course={course}></Course>
+                    <Course course={course} showGotoCourse={true}></Course>
                   </div>
                 );
               })}

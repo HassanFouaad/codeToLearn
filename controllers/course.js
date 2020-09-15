@@ -80,10 +80,9 @@ exports.addCourse = async (req, res) => {
 
 exports.getCourses = async (req, res) => {
   try {
-    let courses = await Course.find({}).populate(
-      "teacher",
-      "_id firstname lastname email"
-    );
+    let courses = await Course.find({})
+      .populate("teacher", "_id firstname lastname email")
+      .select("-photo");
     if (!courses) {
       res.status(500).json({ error: "SERVER ERRORS" });
     }
@@ -125,8 +124,9 @@ exports.getSingleCourse = async (req, res) => {
   let course = req.params.courseId;
   try {
     let courseFound = await Course.findById(course)
-      .populate("teacher", "username email")
-      .select("-lessons").select("-photo");
+      .populate("teacher", "firstname lastname username email")
+      .select("-lessons")
+      .select("-photo");
     if (!courseFound) {
       res.status(404).json({ error: "No Courses Found" });
     }
@@ -282,4 +282,76 @@ exports.courseById = (req, res, next, id) => {
     req.course = course;
     next();
   });
+};
+/* const form = new formidable.IncomingForm();
+    form.keepExtensions = true;
+    form.onPart = function (part) {
+      if (!part.filename || part.filename.match(/\.(jpg|jpeg|png)$/i)) {
+        this.handlePart(part);
+      } else {
+        return res.json({ error: "Only JPG or PNG are allowed" });
+      }
+    };
+    form.on("field", (name, value) => {
+      if (name === username) {
+      }
+    });
+    form.uploadDir = "uploads/";
+    form.parse(req, async (err, fields, files) => {
+      const { email, username, password, firstname, lastname } = fields;
+
+      if (files.avatar) {
+        //1mb = 1000000
+      }
+      if (err) {
+        console.log(err);
+        return res.status(400).json({ error: "Image couldn't be Uploaded" });
+      }
+      user = new User({
+        email,
+        username,
+        password,
+        firstname,
+        lastname,
+        avatar: files.path,
+      });
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+      await user.save();
+      const payload = {
+        user,
+      };
+
+      jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        { expiresIn: 36000000 },
+        (err, token) => {
+          if (err) {
+            console.log(err);
+            throw err;
+          }
+          res.status(200).json({ user, token });
+        }
+      );
+    }); */
+
+exports.courseSearch = async (req, res) => {
+  try {
+    const query = {};
+    if (req.query.search) {
+      query.name = { $regex: req.query.search, $options: "i" };
+    }
+    console.log({ query });
+    const courses = await Course.find(query).select("-photo");
+    if (!courses) {
+      return res.status(404).json({ msg: "No Courses Found" });
+    }
+    res.status(200).json(courses);
+  } catch (error) {
+    if (error) {
+      console.error(error);
+      return res.status(400).json({ error });
+    }
+  }
 };
